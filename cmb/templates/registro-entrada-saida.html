@@ -1,0 +1,97 @@
+<p class="text-muted mb-3">Registro de entrada e saída de aluno</p>   
+
+<!-- Formulário de registro de entrada e saída -->
+{% if is_admin() or is_operador() %}
+<div class=" d-flex flex-row">
+    <div>
+        <a href="{{request.path}}?reset" role="button" class="btn btn-light me-2" title="Limpar campos">
+            <i class="fa-regular fa-trash-can text-secondary"></i>
+        </a>    
+    </div>
+    <div>        
+        <form id="frm-registro" method="post" action="{{ url_for('registro.add_registro') }}" accept-charset="utf-8">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />   
+            <div class="row g-2">
+                <div class="col-sm-2">    
+                    <input type="text" name="aluno_matricula" id="aluno-matricula" class="form-control" placeholder="Matrícula" aria-label="Matrícula" value="{{ session['registro']['aluno_matricula'] }}">
+                </div>
+                <div class="col-sm-4">
+                    <input type="text" name="aluno_nome" id="aluno-nome" class="form-control uppercase" placeholder="Nome completo" aria-label="Nome completo" value="{{ session['registro']['aluno_nome'] }}">
+                </div>
+                <div class="col-sm-2">
+                    <select name="aluno_turma" id="aluno-turma" class="form-select mb-2">
+                        <option value="">Turma</option>
+                        {% for turma in turmas_ativas %}
+                        <option value="{{ turma.id }}" {% if session['registro']['aluno_turma']|int == turma.id|int %}selected{% endif %}>{{ turma.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-1" style="margin-top: -1px;">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="tipo_evento" id="tipo-registro-1" value="1" {% if session['registro']['tipo_evento'] == "1" %}checked{% endif %}>
+                        <label class="form-check-label" for="tipo-registro-1">Entrada</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="tipo_evento" id="tipo-registro-2" value="2" {% if session['registro']['tipo_evento'] == "2" %}checked{% endif %}>
+                        <label class="form-check-label" for="tipo-registro-2">Saída</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" name="dt_evento" id="dt-evento"  class="form-control date-time" readonly placeholder="Horário" aria-label="Data e horário">
+                </div>
+                <div class="col-sm-1">           
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </div>
+        </form>
+    </div>    
+</div>
+{% endif %}
+
+<!-- Loading -->
+<div class="spinner-border text-success loading mt-5" role="status">
+    <span class="visually-hidden">Aguarde...</span>
+</div>
+
+<!-- Datatables -->
+<div class="col-sm-12 mt-5 wrap-admin d-none">         
+    <table id="tbl-painel" class="table nowrap table-striped" style="width:100%" cellspacing="0">
+    <thead>
+        <tr>
+        <th title="Data de lançamento pelo operador">Dt Lançamento</th>
+        <th>Matrícula</th>
+        <th>Nome do aluno</th>
+        <th>Ano/Turma</th>          
+        <th>Evento</th>
+        <th title="Data da entrada/saída do aluno">Dt Entrada/Saída</th>     
+        <th>~</th>      
+        </tr>
+    </thead> 
+    <tbody>
+        {% for registro in registros %} 
+ 
+        {% set dt_evento = registro.id+registro.dt_evento.strftime('%Y%m%d%H%M%s')|int  %}
+        <tr>
+        <td class="align-middle py-3">{{ registro.dt_lancamento.strftime('%d/%m/%Y %H:%M')  }}</td>
+        <td class="align-middle">{{ registro.aluno.matricula }}</td>
+        <td class="align-middle">{{ registro.aluno.nome }}</td>
+        <td class="align-middle">{{ registro.turma.nome }}</td>
+        <td class="align-middle">{{ '<span class="badge bg-dark badge-evento">Entrada</span>'|safe if registro.tipo_evento == "1" else '<span class="badge bg-secondary badge-evento">Saída</span>'|safe }}</td>
+        <td class="align-middle" data-sort="{{ dt_evento }}">{{ registro.dt_evento.strftime('%d/%m/%Y %H:%M')  }}</td>
+   
+        <td class="align-middle">
+            {% if is_admin() or is_operador() %}
+
+                {% if is_admin() or registro.dt_lancamento.strftime('%Y%m%d') == now('%Y%m%d') %}
+                <button type="button" class="btn btn-light btn-registro-del" data-id-registro="{{ registro.id }}" data-matricula="{{ registro.aluno.matricula }}" data-aluno="{{ registro.aluno.nome }}" data-dt1="{{ dt1 }}" data-dt2="{{ dt2 }}" data-evento="{{ 'Entrada' if registro.tipo_evento == '1' else 'Saída' }}" data-dt-evento="{{ registro.dt_evento.strftime('%d/%m/%Y %H:%M') }}" data-url="{{ url_for('registro.del_registro', id=registro.id) }}">
+                    <i class="fa-regular fa-trash-can text-primary"></i>
+                </button>  
+                {% endif %}
+            {% endif %}
+        </td>
+      
+        </tr>
+        {% endfor %}
+    </tbody>       
+    </table>
+</div>

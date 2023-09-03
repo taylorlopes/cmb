@@ -1,0 +1,194 @@
+<div class="d-flex align-items-start">
+    <div class="nav flex-column nav-pills me-3 bg-white" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <button class="nav-link active" id="v-pills-aluno-tab" data-bs-toggle="pill" data-bs-target="#v-pills-aluno"
+            type="button" role="tab" aria-controls="v-pills-aluno" aria-selected="true">Alunos</button>
+        <button class="nav-link" id="v-pills-turma-tab" data-bs-toggle="pill" data-bs-target="#v-pills-turma"
+            type="button" role="tab" aria-controls="v-pills-turma" aria-selected="false">Turmas</button>
+        <button class="nav-link" id="v-pills-senha-tab" data-bs-toggle="pill" data-bs-target="#v-pills-senha"
+            type="button" role="tab" aria-controls="v-pills-senha" aria-selected="false">Senhas</button>
+    </div>
+    <div class="tab-content container" id="v-pills-tabContent">
+        <!-- Alunos -->
+        <div class="tab-pane fade show active" id="v-pills-aluno" role="tabpanel" aria-labelledby="v-pills-aluno-tab">
+            <p class="text-muted mb-3">Cadastro de alunos</p>    
+            <form id="frm-aluno" class="row g-3" method="post" action="{{ url_for('aluno.add_aluno') }}" accept-charset="utf-8">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />                
+                <input type="hidden" name="id" id="id_aluno" value="" />                
+                <div class="col-sm-2">
+                    <input type="text" name="matricula" id="matricula" class="form-control" placeholder="Matrícula">
+                </div>                
+                <div class="col-sm-5">
+                    <input type="text" name="nome" id="nome" class="form-control uppercase" placeholder="Nome do aluno">
+                </div>
+                <div class="col-sm-2 ">
+                    <select class="form-select" name="id_turma" id="id_turma" aria-label="Default select example">
+                        <option value="">Ano/Turma</option>
+                        {% for turma in turmas %}                        
+                        <option value="{{ turma.id }}">{{ turma.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>     
+                <div class="col-auto">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" value="1" id="aluno-ativo" name="aluno_ativo" checked>
+                        <label class="form-check-label" for="aluno-ativo">
+                          Ativo
+                        </label>
+                    </div>
+                </div>                           
+                <div class="col-sm-2 d-inline-block">
+                    <button type="submit" class="btn btn-primary btn-aluno-add">Adicionar</button>
+                    <button type="submit" class="btn btn-primary btn-aluno-update d-none">Alterar</button>
+                    <button type="button" class="btn btn-danger btn-aluno-update-cancelar d-none" data-url="{{ url_for('aluno.add_aluno') }}">Cancelar</button>
+                </div>
+            </form>
+            <hr class="hr my-4" />
+            <!-- Datatables Alunos-->
+            <div class="col-sm-12 my-3">
+                <table id="tbl-alunos" class="table nowrap table-striped" style="width:100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>                            
+                            <th>Matrícula</th>
+                            <th>Nome</th>
+                            <th>Ano/Turma</th>
+                            <th>Ativo</th>
+                            <th>~</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for aluno in alunos %}
+                        <tr>
+                            <td class="align-middle">{{ aluno.id }}</td>                            
+                            <td class="align-middle">{{ aluno.matricula }}</td>
+                            <td class="align-middle">{{ aluno.nome }}</td>
+                            <td class="align-middle">{{ aluno.turma.nome }}</td>
+                            <td class="align-middle">{{ 'Sim' if aluno.ativo == '1' else 'Não' }}</td>
+                            <td class="align-middle text-end">        
+                                <button type="button" class="btn btn-light btn-aluno-edit" data-id="{{ aluno.id }}"  data-matricula="{{ aluno.matricula }}" data-nome="{{ aluno.nome }}" data-id-turma="{{ aluno.id_turma }}" data-aluno-ativo="{{ aluno.ativo }}"  data-url="{{ url_for('aluno.update_aluno_edit', matricula=aluno.matricula) }}">
+                                    <i class="fa-regular fa-pen text-primary"></i>
+                                </button>                                   
+                                <button type="button" class="btn btn-light btn-aluno-del" data-matricula="{{ aluno.matricula }}" data-nome="{{ aluno.nome }}" data-url="{{ url_for('aluno.del_aluno', matricula=aluno.matricula) }}">
+                                    <i class="fa-regular fa-trash-can text-primary"></i>
+                                </button>                                
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> <!-- /Datatables Alunos-->
+        </div> <!-- /Alunos -->
+
+        <!-- Turmas -->
+        <div class="tab-pane fade" id="v-pills-turma" role="tabpanel" aria-labelledby="v-pills-turma-tab">
+            <p class="text-muted mb-3">Cadastro de turmas</p>   
+            <form id="frm-turma" class="row g-3" method="post" action="{{ url_for('turma.add_turma') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input type="hidden" name="id" id="id_turma_edit" value="" />    
+                <div class="col">
+                    <input type="text" name="turma" id="turma" class="form-control" placeholder="Ano/Turma">
+                </div>
+                <div class="col-auto">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" value="1" id="turma-ativo" name="turma_ativo" checked>
+                        <label class="form-check-label" for="turma-ativo">
+                          Ativo
+                        </label>
+                    </div>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary btn-turma-add">Adicionar</button>
+                    <button type="submit" class="btn btn-primary btn-turma-update d-none">Alterar</button>
+                    <button type="button" class="btn btn-danger btn-turma-update-cancelar d-none" data-url="{{ url_for('turma.add_turma') }}">Cancelar</button>                    
+                </div>
+            </form>
+            <hr class="hr my-4" />
+            <!-- Datatables Turmas-->
+            <div class="col-sm-12 my-3">
+                <table id="tbl-turmas" class="table nowrap table-striped" style="width:100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ano/Turma</th>
+                            <th>Ativo</th>
+                            <th>~</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for turma in turmas %}
+                        <tr>
+                            <td class="align-middle">{{ turma.id }}</td>
+                            <td class="align-middle">{{ turma.nome }}</td>
+                            <td class="align-middle">{{ 'Sim' if turma.ativo == '1' else 'Não' }}</td>
+                            <td class="align-middle text-end">                                    
+                                <button type="button" class="btn btn-light btn-turma-edit" data-id="{{ turma.id }}"  data-turma="{{ turma.nome }}" data-turma-ativo="{{ turma.ativo }}" data-url="{{ url_for('turma.update_turma_edit', id=turma.id) }}">
+                                    <i class="fa-regular fa-pen text-primary"></i>
+                                </button> 
+                                <button type="button" class="btn btn-light btn-turma-del" data-id="{{ turma.id }}" data-turma="{{ turma.nome }}" data-url="{{ url_for('turma.del_turma', id=turma.id) }}">
+                                    <i class="fa-regular fa-trash-can text-primary"></i>
+                                </button>                                
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> <!-- /Datatables Turmas-->
+        </div><!-- /Turmas -->
+
+
+        <!-- Senhas -->
+        <div class="tab-pane fade" id="v-pills-senha" role="tabpanel" aria-labelledby="v-pills-senha-tab">
+            <p class="text-muted mb-3">Atualização de senhas</p>   
+            <form class="row g-3" method="post" action="{{ url_for('perfil.update_id_perfil') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="col">
+                    <select class="form-select" name="id_perfil" aria-label="Default select example">
+                        {% for perfil in perfis %}
+                        <option value="{{ perfil.id }}">{{ perfil.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="password" name="senha" class="form-control" placeholder="Nova senha">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Alterar</button>
+                </div>
+            </form>
+
+            <!-- Tabela de tipo de permissões -->
+            <p class="text-muted mb-3 mt-4">Tipo de permissão por usuário</p>
+            <div class="row">
+                <div class="col-sm-8 border bg-white">
+                    <table class="table mt-1">
+                        <thead>
+                            <tr>
+                                <th scope="col">Usuário</th>
+                                <th scope="col">Permissão</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for perfil in perfis %}
+                            <tr>
+                                <td>{{ perfil.nome }}</td>
+                                <td>{{ perfil.descricao }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Dica de reset senhas -->
+            <p class="text-muted mb-3 mt-4">Redefinição de todas a senhas</p>
+            <div class="row">
+                <div class="col-sm-8 border bg-white p-3">
+                    <small class="text-muted d-block"># No servidor onde o container Docker está rodando, execute:</small>
+                    <code>docker exec -it cmb python db-create.py --pwd</code>
+                </div>
+            </div> 
+
+        </div><!-- /Senhas -->
+
+    </div>
+</div>

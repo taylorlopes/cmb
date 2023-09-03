@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Wrap -->
+<div class="row">
+  
+  <!-- Wrap painel -->
+  <div class="col-sm-12 pt-3 mb-5"> 
+
+    <!-- Abas de navegação -->
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+        
+        <button class="nav-link active" id="nav-registro-tab" data-bs-toggle="tab" data-bs-target="#nav-registro" type="button" role="tab" aria-controls="nav-registro" aria-selected="true">
+          Registro
+        </button>
+     
+      
+        {% if is_admin() %}
+        <button class="nav-link" id="nav-manutencao-tab" data-bs-toggle="tab" data-bs-target="#nav-manutencao" type="button" role="tab" aria-controls="nav-manutencao" aria-selected="false">
+          Manutenção
+        </button>
+        {% endif %}
+
+      </div>
+    </nav> <!-- /Abas de navegação -->
+
+    <!-- Conteúdo de abas de navegação -->
+    <div class="tab-content" id="nav-tabContent">
+
+      
+      <!-- Registro de entrada e saída -->
+      <div class="tab-pane fade show active py-3" id="nav-registro" role="tabpanel" aria-labelledby="nav-registro-tab">        
+        {% include 'registro-entrada-saida.html' %}  
+      </div>
+
+
+      <!-- Manutenção (admin) -->
+      {% if is_admin() %}
+      <div class="tab-pane fade py-3" id="nav-manutencao" role="tabpanel" aria-labelledby="nav-manutencao-tab">        
+        {% include 'manutencao.html' %}  
+      </div>
+      {% endif %}
+
+    </div> <!-- /Conteúdo de abas de navegação -->   
+
+  </div>  <!-- /Wrap painel -->
+
+</div> <!-- /Wrap -->
+
+
+<!-- Modal Aviso -->
+<div class="modal fade" id="modal-aviso" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="modalAvisoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAvisoLabel">Aviso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="aviso-message" class="lh-lg"></div>                
+            </div>
+            <div class="modal-footer">
+                <form id="frm-modal-aviso" action="" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button type="submit" class="btn btn-primary">Confirmar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> <!-- /Modal Aviso -->
+
+
+ 
+{% endblock content %}
+
+{% block scripts %}
+<script> 
+
+// Data e hora de entrada e saída
+CURRENT_DATETIME = new Date()
+getCurrentDateTimeFromServer() 
+function getCurrentDateTimeFromServer() {
+  $.ajax({
+    url: '{{ url_for("registro.get_current_datetime") }}', 
+    success: function(data){
+      CURRENT_DATETIME = data.datetime
+    }
+  });    
+}  
+
+$(function() {
+
+  /**
+   * Lista os documentos em um DataTable
+   * 
+   */
+  table = $('#tbl-painel').DataTable({
+    responsive: true, 
+    order: [[6, 'desc']],
+    "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json"
+    },
+    fixedHeader: true,
+    "dom": '<"t-header"<"t-col1"l><"t-col2"B><"t-col3"><"t-col4"f>>rt<"t-footer"<"t-col5"i><"t-col6"p>>',   
+    fnInitComplete: function(){
+      $('.t-col3').html('<label>Período <input type="text" name="dt_search" id="dt-search" class="form-control form-control-sm" readonly></label>');
+      init_daterangepicker()
+    },    
+    buttons: [
+        {
+            extend:    'copyHtml5',
+            text:      '<i class="fa-solid fa-copy"></i>',
+            titleAttr: 'Copiar'
+        },
+        {
+            extend:    'excelHtml5',
+            text:      '<i class="fa-solid fa-file-excel"></i>',
+            titleAttr: 'Excel'
+        },
+        {
+            extend:    'csvHtml5',
+            text:      '<i class="fa-solid fa-file-csv"></i>',
+            titleAttr: 'CSV'
+        },
+        {
+            extend:    'pdfHtml5',
+            text:      '<i class="fa-solid fa-file-pdf"></i>',
+            titleAttr: 'PDF'
+        }
+    ],      
+  });   
+
+  // Ajusta as colunas do datatables
+  setTimeout(function() {
+    $('.loading').addClass('d-none')
+    $('.wrap-admin').fadeIn().removeClass('d-none');    
+    table.columns.adjust().draw();
+  }, 300)
+
+  // Se existir uma ancora, exibe página que o usuário estava 
+  switch( $(location).attr('hash') ) {
+    case '#manutencao-alunos':
+      $('button#nav-manutencao-tab').click();
+      $('button#v-pills-aluno-tab').click();
+      break;
+    case '#manutencao-turmas':
+      $('button#nav-manutencao-tab').click();
+      $('button#v-pills-turma-tab').click();
+      break;
+    case '#manutencao-senhas':
+      $('button#nav-manutencao-tab').click();
+      $('button#v-pills-senha-tab').click();
+      break;
+  }  
+   
+  // Turmas DataTable
+  $('#tbl-turmas').DataTable({
+    responsive: true, 
+    order: [[3, 'asc']],
+    "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json"
+    },   
+    buttons: [],
+    dom: 'Blfrtip',       
+  });
+
+  // Alunos DataTable
+  $('#tbl-alunos').DataTable({
+    responsive: true, 
+    order: [[5, 'asc']],
+    "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json"
+    },   
+    buttons: [],
+    dom: 'Blfrtip',       
+  }); 
+
+  // Turmas delete 
+  $('.btn-turma-del').on('click', function() {
+    $('#aviso-message').html(`Deseja realmente excluir turma <strong>${$(this).data('turma')}</strong>?`)
+    $("#modal-aviso").modal('show');
+    $('#frm-modal-aviso').attr('action', $(this).data('url'))
+  });
+
+  // Alunos delete
+  $('.btn-aluno-del').on('click', function() {
+    $('#aviso-message').html(`Deseja realmente excluir aluno de matrícula <strong>${$(this).data('matricula')}</strong>?`)
+    $("#modal-aviso").modal('show');
+    $('#frm-modal-aviso').attr('action', $(this).data('url'))
+  });
+
+  // Registro delete  
+  $('.btn-registro-del').on('click', function() {
+    $('#aviso-message').html(`Deseja excluir a ${$(this).data('evento')} de <strong>${$(this).data('aluno')}</strong>, matrícula ${$(this).data('matricula')}, na data/hora ${$(this).data('dt-evento')}h?`)
+    $("#modal-aviso").modal('show');
+    $('#frm-modal-aviso').attr('action', $(this).data('url'))
+  });
+ 
+  // Alunos edit 
+  $('.btn-aluno-edit').on('click', function() {      
+    $('.btn-aluno-update').removeClass('d-none')
+    $('.btn-aluno-update-cancelar').removeClass('d-none')   
+    $('.btn-aluno-add').addClass('d-none')   
+    $('#frm-aluno').attr('action', $(this).data('url'))  
+    $('#id_aluno').val( $(this).data('id') )  
+    $('#matricula').val( $(this).data('matricula') )  
+    $('#nome').val( $(this).data('nome') )  
+    $('#id_turma').val( $(this).data('id-turma') ).change();  
+    $('#aluno-ativo').prop('checked', $(this).data('aluno-ativo') )  
+  });
+  $('.btn-aluno-update-cancelar').on('click', function() {      
+    $('.btn-aluno-update').addClass('d-none')
+    $('.btn-aluno-update-cancelar').addClass('d-none')   
+    $('.btn-aluno-add').removeClass('d-none')   
+    $('#frm-aluno').attr('action', $(this).data('url'))  
+    $('#id_aluno').val('')  
+    $('#matricula').val('')  
+    $('#nome').val('')  
+    $('#id_turma').val('').change();   
+    $('#aluno-ativo').prop('checked', true)  
+  }); 
+
+  // Turmas edit 
+  $('.btn-turma-edit').on('click', function() {      
+    $('.btn-turma-update').removeClass('d-none')
+    $('.btn-turma-update-cancelar').removeClass('d-none')   
+    $('.btn-turma-add').addClass('d-none')   
+    $('#frm-turma').attr('action', $(this).data('url'))  
+    $('#id_turma_edit').val( $(this).data('id') )      
+    $('#turma').val( $(this).data('turma') )  
+    $('#turma-ativo').prop('checked', $(this).data('turma-ativo') )  
+  });
+  $('.btn-turma-update-cancelar').on('click', function() {      
+    $('.btn-turma-update').addClass('d-none')
+    $('.btn-turma-update-cancelar').addClass('d-none')   
+    $('.btn-turma-add').removeClass('d-none')   
+    $('#frm-turma').attr('action', $(this).data('url'))  
+    $('#id_turma_edit').val('')  
+    $('#turma').val('')  
+    $('#turma-ativo').prop('checked', true)  
+  }); 
+
+  /**
+   * Date Range Picker
+   * - https://github.com/dangrossman/daterangepicker
+   * - http://www.daterangepicker.com/
+   * 
+   */
+  $('#dt-evento').daterangepicker({
+    "timePicker": true,
+    "singleDatePicker": true,
+    "timePicker24Hour": true,
+    "startDate": new Date(CURRENT_DATETIME),
+    // endDate: moment().startOf('hour').add(32, 'hour'),
+    "locale": {
+        "format": 'DD/MM/YYYY HH:mm',
+        "separator": " - ",
+        "applyLabel": "Aplicar",
+        "cancelLabel": "Cancelar",
+        "fromLabel": "De",
+        "toLabel": "Para",
+        "customRangeLabel": "Personalizar",
+        "weekLabel": "S",
+        "daysOfWeek": [
+            "D",
+            "S",
+            "T",
+            "Q",
+            "Q",
+            "S",
+            "S"
+        ],
+        "monthNames": [
+            "Janeiro",
+            "Fevereiro",
+            "Março",
+            "Abril",
+            "Maio",
+            "Junho",
+            "Julho",
+            "Agosto",
+            "Setembro",
+            "Outubro",
+            "Novembro",
+            "Dezembro"
+        ],
+        "Primeiro Dia": 1
+    },    
+  });
+  $('#dt-evento').val( "{{ session['registro']['dt_evento'] }}" )
+
+}); // ready()
+
+ 
+/*
+ * Daterangepicker do Datatables
+ * 
+ */
+function init_daterangepicker() {
+  $('#dt-search').daterangepicker({
+    "timePicker": true,
+    "timePicker24Hour": true,
+    "startDate": new Date('{{ dt1 }}'),
+    "endDate": new Date('{{ dt2 }}'),
+    "locale": {
+        "format": 'DD/MM/YYYY HH:mm',
+        "separator": " - ",
+        "applyLabel": "Aplicar",
+        "cancelLabel": "Cancelar",
+        "fromLabel": "De",
+        "toLabel": "Para",
+        "customRangeLabel": "Personalizar",
+        "weekLabel": "S",
+        "daysOfWeek": [
+            "D",
+            "S",
+            "T",
+            "Q",
+            "Q",
+            "S",
+            "S"
+        ],
+        "monthNames": [
+            "Janeiro",
+            "Fevereiro",
+            "Março",
+            "Abril",
+            "Maio",
+            "Junho",
+            "Julho",
+            "Agosto",
+            "Setembro",
+            "Outubro",
+            "Novembro",
+            "Dezembro"
+        ],
+        "Primeiro Dia": 1
+    },    
+  });
+  $('#dt-search').on('apply.daterangepicker', function(ev, picker) {
+    let dt1 = picker.startDate.format('YYYY-MM-DD HH:mm') 
+    let dt2 = picker.endDate.format('YYYY-MM-DD HH:mm') 
+    location = "{{ url_for('painel.inicial') }}" + `?dt1=${dt1}&dt2=${dt2}` 
+  });  
+}  
+
+// Ao mudar o tipo de evento (entrada/saída), atualiza a data de entrada/saída
+$('[id^="tipo-registro"]').on('click', function() {
+  getCurrentDateTimeFromServer()
+  setTimeout(() => {
+    console.log(CURRENT_DATETIME)
+    $('#dt-evento').data('daterangepicker').setStartDate( new Date(CURRENT_DATETIME) );
+  }, 100);
+});
+
+// Autocomplete Matricula https://github.com/devbridge/jQuery-Autocomplete
+$('#aluno-matricula').autocomplete({
+    serviceUrl: '{{ url_for("aluno.get_aluno_matricula") }}',
+    paramName: 'matricula',
+    minChars: 3,
+    width: 'flex',
+    onSelect: function (suggestion) { 
+      $("#aluno-nome").val(suggestion.nome);
+      $("#aluno-turma").val(suggestion.id_turma).change();
+    }, 
+    formatResult: function (suggestion, currentValue) {
+      reset_registro('#aluno-matricula')
+      // $('#aluno-nome').val('')
+      // $('#aluno-turma').val('')
+      return `${suggestion.matricula}, ${suggestion.turma}, ${suggestion.nome}`
+    }, 
+});
+
+  // Autocomplete Nome Aluno https://github.com/devbridge/jQuery-Autocomplete
+$('#aluno-nome').autocomplete({
+    serviceUrl: '{{ url_for("aluno.get_aluno_nome") }}',
+    paramName: 'aluno',
+    minChars: 3,
+    width: 'flex',
+    onSelect: function (suggestion) { 
+      $("#aluno-matricula").val(suggestion.matricula);
+      $("#aluno-turma").val(suggestion.id_turma).change();
+    }, 
+    formatResult: function (suggestion, currentValue) {
+      // reset_registro('#aluno-nome')
+      // $('#aluno-matricula').val('')
+      // $('#aluno-turma').val('')
+      return `${suggestion.matricula}, ${suggestion.turma}, ${suggestion.nome}`
+    }, 
+});
+
+// Limpa campos do registro de entrada/saída
+function reset_registro(except) {
+  if (except != '#aluno-matricula') $('#aluno-matricula').val('')
+  if (except != '#aluno-nome')      $('#aluno-nome').val('')
+  if (except != '#aluno-turma')     $('#aluno-turma').val('')  
+  if (except != '.date-time')       $('.date-time').val('')  
+  if (except != '#tipo-registro-1') $('#tipo-registro-1').prop('checked', false)  
+  if (except != '#tipo-registro-2') $('#tipo-registro-2').prop('checked', false)  
+}
+
+// Limpa campos quando digita a matrícula
+$('#aluno-matricula').on('input', function() {
+  if ($(this).val() == '') {
+    reset_registro()
+  }
+});
+
+// Tranforma entrada para maiúscula uppercase quando o campo tem classe .uppercase
+$(document).on('input', "input.uppercase", function () {
+    $(this).val(function (_, val) {
+        return val.toUpperCase();
+    });
+});
+
+</script> 
+{% endblock scripts %}

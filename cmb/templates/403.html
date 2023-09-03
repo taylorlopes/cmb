@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo-cmb.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <title>CMB - Erro</title>
+</head>
+<body style="background-color: white;">
+    <main class="form-errors"> 
+        <div class="text-center">
+            <img class="img-fluid" width="30%" src="{{ url_for('static', filename='images/cmb.png') }}" /> 
+        </div>            
+        <div class="logo-title">(403 Forbidden)</div>        
+        <div class="form-floating text-center">
+            Você não está autorizado a acessar este recurso. Tente novo <a href="{{ url_for('auth.logout') }}">login</a>. <br /><br />
+            <strong>IP {{ ip }}</strong>
+        </div>
+    </main>  
+</body>
+</html>

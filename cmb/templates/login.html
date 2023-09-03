@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!--
+    Copyright (c) CMB/EB 2023, All Rights Reserved 
+    
+    THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED 
+    IN THIS NOTICE BE LIABLE FOR ANY CLAIM OR CONSEQUENTIAL DAMAGES OR ANY 
+    DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE DATA OR PROFITS, WHETHER
+    IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+    OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+    
+    Author Taylor Lopes <taylor.lopes@eb.mil.br>
+    --> 
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo-cmb.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <link href="{{ url_for('static', filename='fonts/css/fontawesome.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='fonts/css/brands.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='fonts/css/solid.css') }}" rel="stylesheet">
+    <title>CMB - Login</title>
+</head>
+
+
+<body>
+
+    <main class="form-signin">
+ 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              {% include 'toasts.html' %}
+          {% endif %}
+        {% endwith %}       
+      
+        <form method="post" action="{{ url_for('auth.autenticar') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>            
+            
+            <div class="text-center">
+                <img class="img-fluid" width="30%"  src="{{ url_for('static', filename='images/cmb.png') }}" /> 
+            </div>      
+            <br />      
+            <div class="logo-title">Controle de entrada e saída de alunos</div>
+           
+            <div class="form-floating">
+                <select name="id" class="form-select mb-2"> 
+                {% for perfil in perfis %}
+                    <option value="{{ perfil.id }}" {% if perfil.id == 3 %}selected{% endif %}>{{ perfil.nome }} </option>                    
+                {% endfor %}  
+                </select> 
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" maxlength="8" id="floatingPassword" name="senha" placeholder="Password">
+                <label for="floatingPassword">Senha</label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
+        </form>
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.slim.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('.toast').toast('show');
+        });
+    </script>    
+
+</body>
+
+</html>

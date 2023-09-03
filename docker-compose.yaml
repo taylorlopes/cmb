@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  cmb:
+    image: cmb:1.0
+    container_name: cmb
+    network_mode: bridge
+    ports:
+      - "8083:443"
+    volumes:
+      - .:/app
+      - dbdata:/app/db
+
+    command: /bin/bash -c "python -m gunicorn --reload --certfile ../ssl/cert.pem --keyfile ../ssl/key.pem -b 0.0.0.0:443 --chdir cmb 'app:create_app()'"
+    restart: on-failure
+
+volumes:
+  dbdata:
