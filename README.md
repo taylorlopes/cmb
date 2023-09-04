@@ -111,7 +111,7 @@ docker-compose down
 docker-compose up -d
 ```
 
-Recriar o banco de dados da aplicação (este comando irá apagar todos os dados):
+Criar ou recriar o banco de dados da aplicação (este comando irá apagar todos os dados):
 ```bash
 docker exec -it cmb python db-create.py --reset
 ```
