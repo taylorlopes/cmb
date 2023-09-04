@@ -8,4 +8,4 @@ ENV TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY . /app
 RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
-CMD ["python3", "app.py"]
+CMD ["python3", "db-create.py", "--reset"]
