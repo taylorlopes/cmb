@@ -21,7 +21,7 @@ Repositório do código-fonte `CMB`, uma simples aplicação Web em Python que t
 Requer instalação do [Docker](https://www.docker.com/) e do [Git](https://git-scm.com/) no servidor `Linux` que irá hospedar a aplicação.
 
 ## Instalação
-Acessar via ssh o servidor `Linux` onde o Docker foi instalado (substitua 192.168.0.1 pelo ip do servidor):
+Acessar via ssh o servidor `Linux` onde o Docker foi instalado [1]:
 ```bash
 ssh root@192.168.0.1
 ```
@@ -33,8 +33,7 @@ useradd cmb
 
 Criar e acessar o diretório de publicação:
 ```bash
-mkdir -p /home/cmb/www/
-cd /home/cmb/www/
+cd /var/www
 ```
 
 Baixar o código-fonte do repositório git:
@@ -44,7 +43,7 @@ git clone https://github.com/taylorlopes/cmb.git
 
 Acessar o diretório da aplicação:
 ```bash
-cd /home/cmb/www/cmb/
+cd /var/www/cmb
 ```
 
 Criar a imagem Docker (não esqueça o "." no final do comando):
@@ -57,11 +56,14 @@ Criar o container Docker:
 docker-compose up -d
 ```
 
-Acessar a aplicação (substitua 192.168.0.1 pelo ip do servidor):
+Acessar a aplicação [1]:
 ```
 https://192.168.0.1:8083/
 ```
 
+Observação:
+[1] Substitua 192.168.0.1 pelo ip do servidor
+ 
 ## Atualização
 
 Acessar o diretório da aplicação:
