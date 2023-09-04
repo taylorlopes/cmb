@@ -18,13 +18,25 @@ Repositório do código-fonte `CMB`, uma simples aplicação Web em Python que t
 `Gunicorn==20.1.0` 
  
 ## Pré-requisitos
-Requer instalação do [Docker](https://www.docker.com/) e do [Git](https://git-scm.com/) no servidor `Linux` que irá hospedar a aplicação.
+Requer instalação do [Docker](https://www.docker.com/) e do [Git](https://git-scm.com/) no servidor `Linux` Debian/Ubuntu que irá hospedar a aplicação.
+
+Instalar o docker e docker-compose:
+```bash
+wget https://raw.githubusercontent.com/taylorlopes/docker/main/docker-install.sh
+
+chmod +x docker-install.sh
+
+./docker-install.sh
+```
+
+Instalar o git:
+```bash
+sudo apt-get update
+
+sudo apt-get install git
+```
 
 ## Instalação
-Acessar via ssh o servidor `Linux` onde o Docker foi instalado <sup>[1]</sup>:
-```bash
-ssh root@192.168.0.1
-```
 
 Acessar o diretório de publicação:
 ```bash
@@ -41,7 +53,7 @@ Acessar o diretório da aplicação:
 cd /var/www/cmb
 ```
 
-Criar a imagem Docker (não esqueça o "." no final do comando):
+Criar a imagem docker (não esqueça o "." no final do comando):
 ```bash
 docker build -t cmb:1.0 .
 ```
@@ -57,7 +69,10 @@ https://192.168.0.1:8083/
 ```
 
 Observações:\
-[1] Substituir 192.168.0.1 pelo ip do servidor
+[1] Substituir 192.168.0.1 pelo ip do servidor\
+[2] Trocar a chave SECRET_KEY, em config.py\
+[3] Gerar novos arquivos auto-assinado PEM, e ssl/
+
  
 ## Atualização
 
@@ -81,20 +96,19 @@ docker exec -it cmb /bin/bash
 Recriar o container da aplicação:
 ```bash
 cd /var/www/cmb
+
 docker-compose down
+
 docker-compose up -d
 ```
 
 ## Banco de dados
 
+> O docker localmente cria um volume com os dados em /var/lib/docker/volumes/cmb_dbdata/_data/cmb.db 
+
 Visualizar o tamanho do banco de dados (container):
 ```bash
 docker exec -it cmb ls -lh db
-```
-
-Visualizar o tamanho do banco de dados (volume Docker):
-```bash
-ls -lh /var/lib/docker/volumes/cmb_dbdata/_data/cmb.db
 ```
 
 Fazer uma cópia do banco de dados do container para o diretório corrente:
