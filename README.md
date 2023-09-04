@@ -63,7 +63,7 @@ Criar o container Docker:
 docker-compose up -d
 ```
 
-Acessar a aplicação<sup>[1]</sup>:
+Acessar a aplicação<sup>[1]</sup> (senha padrão: 12345678):
 ```
 https://192.168.0.1:8083/
 ```
