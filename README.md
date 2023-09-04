@@ -63,15 +63,14 @@ Criar o container Docker:
 docker-compose up -d
 ```
 
-Acessar a aplicação<sup>[1]</sup> (senha padrão: 12345678):
+Acessar a aplicação<sup>[1]</sup> (substituir 192.168.0.1 pelo ip do servidor, senha padrão: 12345678):
 ```
 https://192.168.0.1:8083/
 ```
 
 Observações:\
-[1] Substituir 192.168.0.1 pelo ip do servidor\
-[2] Trocar a chave SECRET_KEY, em config.py\
-[3] Gerar novos arquivos auto-assinado PEM, e ssl/
+[1] Trocar a chave SECRET_KEY, em config.py\
+[2] Gerar novos arquivos auto-assinado PEM, e ssl/
 
  
 ## Atualização
