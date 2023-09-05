@@ -7,18 +7,31 @@ Repositório do código-fonte `CMB`, uma simples aplicação Web em Python que t
 - Módulo de login
 - Módulo de alunos
 - Módulo de turmas
-- Módulo de registros
+- Módulo de registros (entrada/saída)
 
 ## Tecnologias
+
+### Backend
+`Docker v20.10.5`\
 `Python==3.11.4`\
 `Flask==2.3.2`\
 `Flask-SQLAlchemy==3.0.5`\
 `Flask-WTF==1.1.1`\
 `Jinja2==3.1.2`\
 `Gunicorn==20.1.0` 
- 
+
+### Frontend
+`Bootstrap  v5.3.0`\
+`Font Awesome Free v6.4.0`\
+`jQuery v3.6.3`\
+`DataTables v1.13.6`\
+`Moment.js v2.18.1`\
+`Ajax Autocomplete for jQuery v1.4.11`\
+`Daterangepicker v3.1.0`
+
+
 ## Pré-requisitos
-Requer instalação do [Docker](https://www.docker.com/) e do [Git](https://git-scm.com/) no servidor `Linux` Debian/Ubuntu que irá hospedar a aplicação.
+Requer instalação prévia do [Docker](https://www.docker.com/) e do [Git](https://git-scm.com/) no servidor que irá hospedar a aplicação. Utilize preferencialmente `Linux` [Debian](https://www.debian.org/) ou derivados de Debian.
 
 Instalar o docker e docker-compose:
 ```bash
@@ -69,8 +82,8 @@ https://192.168.0.1:8083/
 ```
 
 Observações:\
-[1] Trocar a chave SECRET_KEY, em config.py\
-[2] Gerar novos arquivos auto-assinado PEM, e ssl/
+[1] Trocar a chave SECRET_KEY, em [.env](https://github.com/taylorlopes/cmb/blob/main/.env)\
+[2] Gerar novos arquivos auto-assinado PEM, em [ssl](https://github.com/taylorlopes/cmb/tree/main/ssl)
 
  
 ## Atualização
@@ -92,7 +105,7 @@ Acessar o container da aplicação:
 docker exec -it cmb /bin/bash
 ```
 
-Recriar o container da aplicação:
+Criar ou recriar o container da aplicação:
 ```bash
 cd /var/www/cmb
 
@@ -103,7 +116,7 @@ docker-compose up -d
 
 ## Banco de dados
 
-> O docker localmente cria um volume com os dados em /var/lib/docker/volumes/cmb_dbdata/_data/cmb.db 
+> O docker localmente cria um volume com os dados em `/var/lib/docker/volumes/cmb_dbdata/_data/cmb.db`
 
 Visualizar o tamanho do banco de dados (container):
 ```bash
@@ -124,7 +137,7 @@ docker-compose down
 docker-compose up -d
 ```
 
-Criar ou recriar o banco de dados da aplicação (este comando irá apagar todos os dados):
+Criar ou recriar o banco de dados da aplicação. ATENÇÃO: este comando irá apagar todos os dados:
 ```bash
 docker exec -it cmb python db-create.py --reset
 ```

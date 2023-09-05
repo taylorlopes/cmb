@@ -11,7 +11,7 @@ services:
       - dbdata:/app/db
 
     command: /bin/bash -c "python -m gunicorn --reload --certfile ../ssl/cert.pem --keyfile ../ssl/key.pem -b 0.0.0.0:443 --chdir cmb 'app:create_app()'"
-    restart: on-failure
+    restart: always
 
 volumes:
   dbdata:
