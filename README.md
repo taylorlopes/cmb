@@ -118,7 +118,7 @@ docker-compose up -d
 
 > O docker localmente cria um volume com os dados em `/var/lib/docker/volumes/cmb_dbdata/_data/cmb.db`
 
-Visualizar o tamanho do banco de dados (container):
+Visualizar o tamanho do banco de dados:
 ```bash
 docker exec -it cmb ls -lh db
 ```
