@@ -1,7 +1,7 @@
 ![](simba/static/images/logo_labra9.png)
 
 # CMB
-Repositório do código-fonte `CMB`, uma simples aplicação Web em Python que tem por finalidade gerenciar o registro de entrada e saída de alunos fora do horário convencional do colégio.  
+Repositório do código-fonte `CMB`, uma simples aplicação Web que tem por finalidade gerenciar o registro de entrada e saída de alunos fora do horário convencional do colégio.  
 
 ## Módulos
 - Módulo de login
@@ -31,7 +31,7 @@ Repositório do código-fonte `CMB`, uma simples aplicação Web em Python que t
 
 
 ## Pré-requisitos
-Requer instalação prévia do [Docker](https://www.docker.com/) e do [Git](https://git-scm.com/) no servidor que irá hospedar a aplicação. Utilize preferencialmente `Linux` [Debian](https://www.debian.org/) ou derivados de Debian.
+Requer instalação prévia do [Docker](https://www.docker.com/) e do [Git](https://git-scm.com/) no servidor que irá hospedar a aplicação. Utilize preferencialmente `Linux` [Debian](https://www.debian.org/) ou derivados.
 
 Instalar o docker e docker-compose:
 ```bash
