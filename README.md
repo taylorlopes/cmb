@@ -120,7 +120,7 @@ docker-compose up -d
 
 Visualizar o tamanho do banco de dados:
 ```bash
-docker exec -it cmb ls -lh db
+docker exec -it cmb du -h db/cmb.db
 ```
 
 Fazer uma cópia do banco de dados do container para o diretório corrente:
