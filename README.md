@@ -132,6 +132,8 @@ Restaurar uma cópia do banco de dados do diretório corrente para o container:
 ```bash
 docker cp ./cmb.db cmb:/app/db/cmb.db 
 
+cd /var/www/cmb
+
 docker-compose down
 
 docker-compose up -d
